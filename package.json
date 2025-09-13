@@ -1,0 +1,29 @@
+{
+  "name": "asia-cup-live",
+  "version": "1.0.0",
+  "description": "🏏 Asia Cup Live streaming site with chat and viewer count",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "http-proxy-middleware": "^2.0.6",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "asia-cup",
+    "live-stream",
+    "express",
+    "firebase",
+    "chat"
+  ],
+  "license": "MIT"
+}
