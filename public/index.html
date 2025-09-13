@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🏏 Asia Cup Live</title>
+
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
@@ -11,185 +13,63 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  
+
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-900 text-white font-sans">
+<body class="bg-gray-900 text-white">
 
   <!-- Header -->
-  <header class="flex items-center justify-between px-4 py-3 bg-gray-800 shadow-md z-50 sticky top-0">
-    <h1 class="text-xl font-bold">🏏 Asia Cup Live</h1>
-    <div class="md:hidden">
-      <button id="menuBtn" class="text-2xl focus:outline-none">☰</button>
-    </div>
-    <nav id="menu" class="hidden md:flex gap-4 items-center">
-      <button id="loginBtn" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">Sign in with Google</button>
-      <button id="logoutBtn" class="hidden bg-red-600 hover:bg-red-700 px-3 py-1 rounded">Logout</button>
+  <header class="bg-gray-800 shadow-md sticky top-0 z-50 flex justify-between items-center px-4 py-3">
+    <h1 class="text-2xl font-bold">🏏 Asia Cup Live</h1>
+    <nav class="hidden md:flex items-center gap-4" id="menu">
+      <button id="loginBtn" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Sign in with Google</button>
+      <button id="logoutBtn" class="hidden bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
       <span id="profileName" class="hidden text-gray-300 ml-2"></span>
     </nav>
+    <button id="menuBtn" class="md:hidden text-2xl focus:outline-none">☰</button>
   </header>
 
-  <!-- Main Layout -->
+  <!-- Main -->
   <main class="flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">
     
     <!-- Video Section -->
     <section class="flex-1 flex flex-col items-center justify-center p-4 relative">
       <p id="viewerCount" class="mb-2 text-gray-400">Viewers Online: 0</p>
 
-      <!-- Video Container -->
-      <div class="relative w-full max-w-3xl">
+      <div class="relative w-full max-w-4xl">
         <video id="video" controls autoplay class="w-full rounded-lg border border-gray-600 shadow-lg"></video>
-        <div id="spinner" class="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden">
-          <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div id="spinner" class="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-60 hidden">
+          <div class="w-14 h-14 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
         <div id="errorOverlay" class="hidden absolute inset-0 flex items-center justify-center bg-red-700 bg-opacity-90 text-white px-4 py-2 rounded-lg shadow-lg">
           ⚠️ Stream not available. Please try again later.
         </div>
       </div>
 
-      <!-- Quality Buttons -->
-      <div class="mt-4 flex flex-wrap gap-2 justify-center">
-        <button onclick="changeQuality('master_664.m3u8')" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">360p</button>
-        <button onclick="changeQuality('master_900.m3u8')" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">480p</button>
-        <button onclick="changeQuality('master_2000.m3u8')" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">720p</button>
-        <button onclick="changeQuality('master_3500.m3u8')" class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded">1080p</button>
+      <div class="mt-4 flex flex-wrap gap-3 justify-center">
+        <button onclick="changeQuality('master_664.m3u8')" class="btn-quality">360p</button>
+        <button onclick="changeQuality('master_900.m3u8')" class="btn-quality">480p</button>
+        <button onclick="changeQuality('master_2000.m3u8')" class="btn-quality">720p</button>
+        <button onclick="changeQuality('master_3500.m3u8')" class="btn-quality">1080p</button>
       </div>
     </section>
 
     <!-- Chat Section -->
     <aside class="w-full md:w-96 bg-gray-800 flex flex-col transition-transform duration-300" id="chatPanel">
-      <div class="flex items-center justify-between p-2 bg-gray-900 md:hidden">
+      <div class="flex items-center justify-between p-3 bg-gray-900 md:hidden">
         <span class="font-semibold">Chat</span>
         <button id="toggleChat" class="text-xl">⬇️</button>
       </div>
       <div id="chatBox" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
       <div class="p-4 flex gap-2">
         <input id="chatInput" type="text" placeholder="Type a message..." class="flex-1 p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
-        <button id="sendBtn" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed" disabled>Send</button>
+        <button id="sendBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed" disabled>Send</button>
       </div>
     </aside>
 
   </main>
 
   <!-- Scripts -->
-  <script>
-    // ===== Firebase Setup =====
-    const firebaseConfig = {
-      apiKey: "AIzaSyBlUX0Hse-jy9RJc-iOTRhwg7a7IYIBdtc",
-      authDomain: "molten-snowfall-393219.firebaseapp.com",
-      projectId: "molten-snowfall-393219",
-      storageBucket: "molten-snowfall-393219.appspot.com",
-      messagingSenderId: "189522276669",
-      appId: "1:189522276669:web:981533b5f99be303721554"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    let currentUser = null;
-
-    // ===== Authentication =====
-    document.getElementById("loginBtn").onclick = () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider);
-    };
-    document.getElementById("logoutBtn").onclick = () => {
-      auth.signOut();
-    };
-    auth.onAuthStateChanged(user => {
-      if(user) {
-        currentUser = user;
-        document.getElementById("loginBtn").classList.add("hidden");
-        document.getElementById("logoutBtn").classList.remove("hidden");
-        document.getElementById("profileName").classList.remove("hidden");
-        document.getElementById("profileName").innerText = user.displayName;
-        document.getElementById("chatInput").disabled = false;
-        document.getElementById("sendBtn").disabled = false;
-      } else {
-        currentUser = null;
-        document.getElementById("loginBtn").classList.remove("hidden");
-        document.getElementById("logoutBtn").classList.add("hidden");
-        document.getElementById("profileName").classList.add("hidden");
-        document.getElementById("chatInput").disabled = true;
-        document.getElementById("sendBtn").disabled = true;
-      }
-    });
-
-    // ===== Chat =====
-    const chatBox = document.getElementById("chatBox");
-    const chatInput = document.getElementById("chatInput");
-    const sendBtn = document.getElementById("sendBtn");
-
-    sendBtn.onclick = async () => {
-      if(!chatInput.value.trim() || !currentUser) return;
-      await db.collection("artifacts").doc("liveApp").collection("public").doc("data").collection("chat").add({
-        name: currentUser.displayName,
-        message: chatInput.value,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      chatInput.value = "";
-    };
-
-    db.collection("artifacts").doc("liveApp").collection("public").doc("data").collection("chat")
-      .orderBy("timestamp")
-      .onSnapshot(snapshot => {
-        chatBox.innerHTML = "";
-        snapshot.forEach(doc => {
-          const msg = doc.data();
-          const div = document.createElement("div");
-          div.classList.add("p-2", "rounded", "bg-gray-700", "break-words", "transition", "duration-300", "ease-in-out", "opacity-0");
-          div.innerHTML = `<strong>${msg.name}:</strong> ${msg.message}`;
-          chatBox.appendChild(div);
-          // Fade-in animation
-          requestAnimationFrame(() => div.classList.remove("opacity-0"));
-        });
-        chatBox.scrollTop = chatBox.scrollHeight;
-      });
-
-    // ===== HLS Video Player =====
-    const video = document.getElementById("video");
-    const spinner = document.getElementById("spinner");
-    let hls;
-
-    function playStream(source) {
-      spinner.classList.remove("hidden");
-      if(Hls.isSupported()) {
-        if(hls) hls.destroy();
-        hls = new Hls();
-        hls.loadSource(`/stream/${source}`);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => spinner.classList.add("hidden"));
-        hls.on(Hls.Events.ERROR, () => spinner.classList.add("hidden"));
-      } else if(video.canPlayType("application/vnd.apple.mpegurl")) {
-        video.src = `/stream/${source}`;
-        video.onloadedmetadata = () => spinner.classList.add("hidden");
-      }
-    }
-    playStream("master_2000.m3u8");
-    function changeQuality(source) {
-      playStream(source);
-    }
-
-    // ===== Viewer Count =====
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const ws = new WebSocket(`${protocol}://${window.location.host}`);
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if(data.viewers !== undefined) {
-        document.getElementById("viewerCount").innerText = `Viewers Online: ${data.viewers}`;
-      }
-    };
-
-    // ===== Mobile Menu =====
-    document.getElementById("menuBtn").onclick = () => {
-      document.getElementById("menu").classList.toggle("hidden");
-    };
-
-    // ===== Mobile Chat Collapse =====
-    const toggleChatBtn = document.getElementById("toggleChat");
-    const chatPanel = document.getElementById("chatPanel");
-    toggleChatBtn?.addEventListener("click", () => {
-      chatPanel.classList.toggle("-translate-y-full");
-    });
-  </script>
+  <script src="main.js"></script>
 </body>
 </html>
