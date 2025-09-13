@@ -3,7 +3,7 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
-/* Video quality buttons */
+/* Video quality & mute buttons */
 .btn-quality {
   background-color: #374151;
   padding: 0.5rem 1rem;
@@ -15,15 +15,51 @@ body {
   background-color: #4B5563;
 }
 
-/* Chat messages fade-in */
-#chatBox div {
-  opacity: 0;
-  transform: translateY(5px);
-  transition: opacity 0.3s, transform 0.3s;
+/* Chat messages */
+.chat-message {
+  display: flex;
+  gap: 2px;
+  align-items: flex-start;
+  padding: 0.5rem;
+  background-color: #1F2937;
+  border-radius: 0.5rem;
+  animation: fadeIn 0.3s ease-in-out;
 }
-#chatBox div.show {
-  opacity: 1;
-  transform: translateY(0);
+
+.chat-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #4B5563;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  flex-shrink: 0;
+}
+
+.chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.chat-time {
+  font-size: 0.7rem;
+  color: #9CA3AF;
+  margin-left: 0.5rem;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px);}
+  to { opacity: 1; transform: translateY(0);}
 }
 
 /* Chat panel for mobile collapse */
