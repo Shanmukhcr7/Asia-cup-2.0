@@ -4,16 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🏏 Asia Cup Live</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- HLS.js -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <link rel="stylesheet" href="styles.css">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body class="bg-gray-900 text-white font-sans">
+
   <!-- Header -->
   <header class="flex items-center justify-between px-4 py-3 bg-gray-800">
     <h1 class="text-xl font-bold">🏏 Asia Cup Live</h1>
@@ -23,23 +29,18 @@
     <nav id="menu" class="hidden md:flex gap-4">
       <button id="loginBtn" class="bg-blue-600 px-3 py-1 rounded">Sign in with Google</button>
       <button id="logoutBtn" class="hidden bg-red-600 px-3 py-1 rounded">Logout</button>
-      <span id="profileName" class="hidden font-semibold"></span>
+      <span id="profileName" class="hidden"></span>
     </nav>
   </header>
 
-  <!-- Layout -->
+  <!-- Main Layout -->
   <main class="flex flex-col md:flex-row h-[calc(100vh-64px)]">
     <!-- Video Section -->
     <section class="flex-1 flex flex-col items-center justify-center p-4 relative">
       <p id="viewerCount" class="mb-2 text-gray-400">Viewers Online: 0</p>
       <video id="video" controls autoplay class="w-full max-w-3xl rounded-lg border border-gray-600"></video>
 
-      <!-- Error overlay -->
-      <div id="errorOverlay" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-700 text-white px-4 py-2 rounded-lg shadow-lg">
-        ⚠️ Stream not available. Please try again later.
-      </div>
-
-      <div class="mt-4 flex gap-2 flex-wrap justify-center">
+      <div class="mt-4 flex gap-2">
         <button onclick="changeQuality('master_664.m3u8')" class="bg-gray-700 px-3 py-1 rounded">360p</button>
         <button onclick="changeQuality('master_900.m3u8')" class="bg-gray-700 px-3 py-1 rounded">480p</button>
         <button onclick="changeQuality('master_2000.m3u8')" class="bg-gray-700 px-3 py-1 rounded">720p</button>
@@ -57,6 +58,109 @@
     </aside>
   </main>
 
-  <script src="main.js"></script>
+  <script>
+    // -------- Firebase Setup --------
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlUX0Hse-jy9RJc-iOTRhwg7a7IYIBdtc",
+      authDomain: "molten-snowfall-393219.firebaseapp.com",
+      projectId: "molten-snowfall-393219",
+      storageBucket: "molten-snowfall-393219.appspot.com",
+      messagingSenderId: "189522276669",
+      appId: "1:189522276669:web:981533b5f99be303721554"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let currentUser = null;
+
+    // -------- Auth --------
+    document.getElementById("loginBtn").onclick = () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider);
+    };
+    document.getElementById("logoutBtn").onclick = () => auth.signOut();
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        document.getElementById("loginBtn").classList.add("hidden");
+        document.getElementById("logoutBtn").classList.remove("hidden");
+        document.getElementById("profileName").classList.remove("hidden");
+        document.getElementById("profileName").innerText = user.displayName;
+        document.getElementById("chatInput").disabled = false;
+        document.getElementById("sendBtn").disabled = false;
+      } else {
+        currentUser = null;
+        document.getElementById("loginBtn").classList.remove("hidden");
+        document.getElementById("logoutBtn").classList.add("hidden");
+        document.getElementById("profileName").classList.add("hidden");
+        document.getElementById("chatInput").disabled = true;
+        document.getElementById("sendBtn").disabled = true;
+      }
+    });
+
+    // -------- Chat --------
+    const chatBox = document.getElementById("chatBox");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    sendBtn.onclick = async () => {
+      if (!chatInput.value.trim() || !currentUser) return;
+      await db.collection("artifacts").doc("liveApp").collection("public").doc("data")
+        .collection("chat").add({
+          name: currentUser.displayName,
+          message: chatInput.value,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      chatInput.value = "";
+    };
+
+    db.collection("artifacts").doc("liveApp").collection("public").doc("data")
+      .collection("chat").orderBy("timestamp")
+      .onSnapshot(snapshot => {
+        chatBox.innerHTML = "";
+        snapshot.forEach(doc => {
+          const msg = doc.data();
+          const div = document.createElement("div");
+          div.classList.add("p-2", "rounded", "bg-gray-700");
+          div.innerHTML = `<strong>${msg.name}:</strong> ${msg.message}`;
+          chatBox.appendChild(div);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+
+    // -------- HLS Video --------
+    const video = document.getElementById("video");
+    let hls;
+    function playStream(source) {
+      if (Hls.isSupported()) {
+        if (hls) hls.destroy();
+        hls = new Hls();
+        hls.loadSource(`/stream/${source}`);
+        hls.attachMedia(video);
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = `/stream/${source}`;
+      }
+    }
+    playStream("master_2000.m3u8");
+    function changeQuality(source) {
+      playStream(source);
+    }
+
+    // -------- WebSocket Viewer Count --------
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const ws = new WebSocket(`${protocol}://${window.location.host}`);
+    ws.onmessage = event => {
+      const data = JSON.parse(event.data);
+      if (data.viewers !== undefined) {
+        document.getElementById("viewerCount").innerText = `Viewers Online: ${data.viewers}`;
+      }
+    };
+
+    // -------- Mobile Menu --------
+    document.getElementById("menuBtn").onclick = () => {
+      document.getElementById("menu").classList.toggle("hidden");
+    };
+  </script>
 </body>
 </html>
