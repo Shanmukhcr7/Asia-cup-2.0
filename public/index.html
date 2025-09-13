@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🏏 Asia Cup Live</title>
-
-  <!-- Tailwind CSS -->
+  <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
@@ -13,66 +12,159 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-900 text-white">
+<body class="bg-gray-900 text-white font-sans h-screen flex flex-col">
 
   <!-- Header -->
-  <header class="bg-gray-800 shadow-md sticky top-0 z-50 flex justify-between items-center px-4 py-3">
-    <h1 class="text-2xl font-bold">🏏 Asia Cup Live</h1>
-    <nav class="hidden md:flex items-center gap-4" id="menu">
-      <button id="loginBtn" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Sign in with Google</button>
-      <button id="logoutBtn" class="hidden bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</button>
-      <span id="profileName" class="hidden text-gray-300 ml-2"></span>
+  <header class="flex items-center justify-between p-4 bg-gray-800">
+    <h1 class="text-xl font-bold">🏏 Asia Cup Live</h1>
+    <nav class="flex items-center gap-2 md:gap-4">
+      <button id="loginBtn" class="bg-blue-600 px-3 py-1 rounded">Sign in with Google</button>
+      <button id="logoutBtn" class="hidden bg-red-600 px-3 py-1 rounded">Logout</button>
+      <span id="profileName" class="hidden font-semibold"></span>
     </nav>
-    <button id="menuBtn" class="md:hidden text-2xl focus:outline-none">☰</button>
   </header>
 
-  <!-- Main -->
-  <main class="flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">
+  <!-- Main layout -->
+  <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
 
     <!-- Video Section -->
     <section class="flex-1 flex flex-col items-center justify-center p-4 relative">
       <p id="viewerCount" class="mb-2 text-gray-400">Viewers Online: 0</p>
+      <video id="video" controls autoplay class="w-full max-w-4xl rounded-lg border border-gray-600"></video>
 
-      <div class="relative w-full max-w-4xl">
-        <video id="video" controls autoplay class="w-full rounded-lg border border-gray-600 shadow-lg"></video>
-
-        <div id="spinner" class="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-60 hidden">
-          <div class="w-14 h-14 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-
-        <div id="errorOverlay" class="hidden absolute inset-0 flex items-center justify-center bg-red-700 bg-opacity-90 text-white px-4 py-2 rounded-lg shadow-lg">
-          ⚠️ Stream not available. Please try again later.
-        </div>
-      </div>
-
-      <div class="mt-4 flex flex-wrap gap-3 justify-center">
-        <button onclick="changeQuality('master_664.m3u8')" class="btn-quality">360p</button>
-        <button onclick="changeQuality('master_900.m3u8')" class="btn-quality">480p</button>
-        <button onclick="changeQuality('master_2000.m3u8')" class="btn-quality">720p</button>
-        <button onclick="changeQuality('master_3500.m3u8')" class="btn-quality">1080p</button>
-        <button id="muteBtn" class="btn-quality">🔊 Mute</button>
+      <div class="mt-4 flex gap-2 flex-wrap justify-center">
+        <button onclick="changeQuality('master_664.m3u8')" class="qualityBtn">360p</button>
+        <button onclick="changeQuality('master_900.m3u8')" class="qualityBtn">480p</button>
+        <button onclick="changeQuality('master_2000.m3u8')" class="qualityBtn">720p</button>
+        <button onclick="changeQuality('master_3500.m3u8')" class="qualityBtn">1080p</button>
       </div>
     </section>
 
     <!-- Chat Section -->
-    <aside class="w-full md:w-96 bg-gray-800 flex flex-col transition-transform duration-300" id="chatPanel">
+    <aside class="w-full md:w-96 bg-gray-800 flex flex-col relative">
       <div class="flex items-center justify-between p-3 bg-gray-900 md:hidden">
         <span class="font-semibold">Chat</span>
         <button id="toggleChat" class="text-xl">⬇️</button>
       </div>
+
       <div id="chatBox" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
-      <div class="p-4 flex gap-2">
-        <input id="chatInput" type="text" placeholder="Type a message..." class="flex-1 p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
-        <button id="sendBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed" disabled>Send</button>
+
+      <div class="p-2 bg-gray-900 flex gap-2 md:p-4">
+        <input id="chatInput" type="text" placeholder="Type a message..." class="flex-1 p-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button id="sendBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Send</button>
       </div>
     </aside>
-
   </main>
 
-  <!-- Scripts -->
-  <script src="main.js"></script>
+  <script>
+    // ====== Firebase Setup ======
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let currentUser = null;
+
+    // ====== Auth ======
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const profileName = document.getElementById("profileName");
+
+    loginBtn.onclick = () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider);
+    };
+    logoutBtn.onclick = () => auth.signOut();
+
+    auth.onAuthStateChanged(user => {
+      if(user){
+        currentUser = user;
+        loginBtn.classList.add("hidden");
+        logoutBtn.classList.remove("hidden");
+        profileName.classList.remove("hidden");
+        profileName.innerText = user.displayName;
+      } else {
+        currentUser = null;
+        loginBtn.classList.remove("hidden");
+        logoutBtn.classList.add("hidden");
+        profileName.classList.add("hidden");
+      }
+    });
+
+    // ====== Chat ======
+    const chatBox = document.getElementById("chatBox");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    sendBtn.onclick = async () => {
+      if(!currentUser){
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider);
+        return;
+      }
+      if(!chatInput.value.trim()) return;
+
+      await db.collection("artifacts").doc("liveApp").collection("public").doc("data").collection("chat").add({
+        name: currentUser.displayName,
+        message: chatInput.value,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      chatInput.value = "";
+    };
+
+    db.collection("artifacts").doc("liveApp").collection("public").doc("data").collection("chat")
+      .orderBy("timestamp")
+      .onSnapshot(snapshot => {
+        chatBox.innerHTML = "";
+        snapshot.forEach(doc => {
+          const msg = doc.data();
+          const div = document.createElement("div");
+          div.classList.add("p-2", "rounded", "bg-gray-700");
+          div.innerHTML = `<strong>${msg.name}:</strong> ${msg.message}`;
+          chatBox.appendChild(div);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+
+    // ====== Video Player ======
+    const video = document.getElementById("video");
+    let hls;
+    function playStream(source){
+      if(Hls.isSupported()){
+        if(hls) hls.destroy();
+        hls = new Hls();
+        hls.loadSource(`/stream/${source}`);
+        hls.attachMedia(video);
+      } else if(video.canPlayType("application/vnd.apple.mpegurl")){
+        video.src = `/stream/${source}`;
+      }
+    }
+    function changeQuality(source){ playStream(source); }
+    playStream("master_2000.m3u8");
+
+    // ====== Viewer count WS ======
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const ws = new WebSocket(`${protocol}://${window.location.host}`);
+    ws.onmessage = event => {
+      const data = JSON.parse(event.data);
+      if(data.viewers!==undefined)
+        document.getElementById("viewerCount").innerText = `Viewers Online: ${data.viewers}`;
+    };
+
+    // ====== Mobile Chat Toggle ======
+    const toggleChat = document.getElementById("toggleChat");
+    const chatPanel = document.querySelector("aside");
+    toggleChat.onclick = () => {
+      chatPanel.classList.toggle("-translate-y-full");
+      toggleChat.innerText = chatPanel.classList.contains("-translate-y-full") ? "⬆️" : "⬇️";
+    };
+  </script>
 </body>
 </html>
