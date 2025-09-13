@@ -2,48 +2,54 @@ const express = require("express");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const http = require("http");
 const WebSocket = require("ws");
+const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-// Serve frontend
-app.use(express.static("public"));
+// Serve static frontend
+app.use(express.static(path.join(__dirname, "public")));
 
-// ---------- HLS Proxy for TataPlay ----------
-const streamMap = {
-  "/stream/master_664.m3u8": "https://tataplay.slivcdn.com/hls/live/2020591/TEN3HD/master_664.m3u8",
-  "/stream/master_900.m3u8": "https://tataplay.slivcdn.com/hls/live/2020591/TEN3HD/master_900.m3u8",
-  "/stream/master_2000.m3u8": "https://tataplay.slivcdn.com/hls/live/2020591/TEN3HD/master_2000.m3u8",
-  "/stream/master_3500.m3u8": "https://tataplay.slivcdn.com/hls/live/2020591/TEN3HD/master_3500.m3u8",
-};
-
+// Proxy TataPlay HLS streams
 app.use(
   "/stream",
   createProxyMiddleware({
     target: "https://tataplay.slivcdn.com",
     changeOrigin: true,
-    router: streamMap,
-    onProxyReq: (proxyReq) => {
-      proxyReq.setHeader("Referer", "https://tataplay.slivcdn.com/");
+    pathRewrite: {
+      "^/stream/(.*)": "/hls/live/2020591/TEN3HD/$1", // rewrite 360p, 480p, 720p, 1080p
+    },
+    onProxyReq: (proxyReq, req, res) => {
+      // Mimic browser headers
+      proxyReq.setHeader("Origin", "https://tataplay.com");
       proxyReq.setHeader(
         "User-Agent",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140 Safari/537.36"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
       );
     },
-    onProxyRes: (proxyRes) => {
+    onProxyRes: (proxyRes, req, res) => {
+      // Allow cross-origin
       proxyRes.headers["Access-Control-Allow-Origin"] = "*";
       proxyRes.headers["Cache-Control"] = "public, max-age=10";
+
+      // Log common errors
+      if (proxyRes.statusCode === 403) {
+        console.error("🚫 TataPlay 403 Forbidden:", req.url);
+      }
+      if (proxyRes.statusCode === 404) {
+        console.error("❌ TataPlay 404 Not Found:", req.url);
+      }
     },
     onError: (err, req, res) => {
-      console.error("Proxy error:", err.message);
+      console.error("🔥 Proxy error:", err.message);
       res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end("Unable to fetch stream");
+      res.end("Proxy Error: Unable to fetch TataPlay stream");
     },
   })
 );
 
-// ---------- WebSocket Viewer Count ----------
+// WebSocket: Track live viewers
 let viewers = 0;
 
 wss.on("connection", (ws) => {
@@ -64,6 +70,8 @@ function broadcastViewers() {
   });
 }
 
-// ---------- Start Server ----------
+// Start server
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`✅ Server running at http://localhost:${PORT}`));
+server.listen(PORT, () => {
+  console.log(`✅ Server running at http://localhost:${PORT}`);
+});
