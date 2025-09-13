@@ -176,3 +176,4 @@ ws.onmessage = event => {
 
 // ====== Initialize ======
 initAuth();
+
