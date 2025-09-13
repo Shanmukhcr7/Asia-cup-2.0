@@ -7,128 +7,161 @@ const firebaseConfig = {
   messagingSenderId: "189522276669",
   appId: "1:189522276669:web:981533b5f99be303721554"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-let currentUser = null;
 
-// ====== DOM Elements ======
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const profileName = document.getElementById("profileName");
+let currentUser = null;
+let chatUnsubscribe = null;
+
+// ====== Elements ======
 const chatBox = document.getElementById("chatBox");
 const chatInput = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
-const video = document.getElementById("video");
-const toggleChat = document.getElementById("toggleChat");
-const viewerCountEl = document.getElementById("viewerCount");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const profileName = document.getElementById("profileName");
 
-let hls;
+// ====== Auth Handling ======
+async function initAuth() {
+  try {
+    // Try Google sign-in first if a token exists
+    if (window.__initial_auth_token) {
+      const credential = firebase.auth.GoogleAuthProvider.credential(window.__initial_auth_token);
+      await auth.signInWithCredential(credential);
+    } else {
+      // Otherwise, sign in anonymously
+      await auth.signInAnonymously();
+    }
+  } catch (error) {
+    console.error("Auth error:", error);
+  }
+}
 
-// ====== Authentication ======
-loginBtn.onclick = () => {
+// Google Sign-in button
+loginBtn.onclick = async () => {
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
+  try {
+    await auth.signInWithPopup(provider);
+  } catch (error) {
+    console.error("Google Sign-in failed:", error);
+  }
 };
-logoutBtn.onclick = () => auth.signOut();
 
+// Logout button
+logoutBtn.onclick = async () => {
+  await auth.signOut();
+};
+
+// Listen to auth state changes
 auth.onAuthStateChanged(user => {
-  if(user){
-    currentUser = user;
+  currentUser = user;
+
+  if (currentUser) {
     loginBtn.classList.add("hidden");
     logoutBtn.classList.remove("hidden");
     profileName.classList.remove("hidden");
-    profileName.innerText = user.displayName;
+    profileName.innerText = currentUser.displayName || "Anonymous";
+
     chatInput.disabled = false;
     sendBtn.disabled = false;
+
+    // Subscribe to chat
+    subscribeToChat();
   } else {
-    currentUser = null;
     loginBtn.classList.remove("hidden");
     logoutBtn.classList.add("hidden");
     profileName.classList.add("hidden");
+    profileName.innerText = "";
+
     chatInput.disabled = true;
     sendBtn.disabled = true;
+
+    // Unsubscribe from chat
+    if (chatUnsubscribe) chatUnsubscribe();
   }
 });
 
-// ====== Chat ======
+// ====== Chat Handling ======
 sendBtn.onclick = async () => {
-  if(!currentUser){
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider);
-    return;
-  }
-  if(!chatInput.value.trim()) return;
+  const message = chatInput.value.trim();
+  if (!message || !currentUser) return;
 
-  await db.collection("artifacts").doc("liveApp").collection("public").doc("data").collection("chat").add({
-    name: currentUser.displayName,
-    message: chatInput.value,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  chatInput.value = "";
+  try {
+    await db.collection("artifacts")
+      .doc("liveApp")
+      .collection("public")
+      .doc("data")
+      .collection("chat")
+      .add({
+        name: currentUser.displayName || "Anonymous",
+        message,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+    chatInput.value = "";
+  } catch (error) {
+    console.error("Failed to send message:", error);
+    alert("Unable to send message. Please try again.");
+  }
 };
 
-db.collection("artifacts").doc("liveApp").collection("public").doc("data").collection("chat")
-  .orderBy("timestamp")
-  .onSnapshot(snapshot => {
-    chatBox.innerHTML = "";
-    snapshot.forEach(doc => {
-      const msg = doc.data();
-      const div = document.createElement("div");
-      div.classList.add("flex", "items-start", "gap-2", "p-2", "rounded", "bg-gray-700");
+// Subscribe to chat updates
+function subscribeToChat() {
+  if (chatUnsubscribe) chatUnsubscribe(); // unsubscribe previous
 
-      // Avatar
-      const avatar = document.createElement("div");
-      avatar.classList.add("avatar");
-      avatar.innerText = msg.name.split(" ").map(n => n[0]).join("").toUpperCase();
+  try {
+    chatUnsubscribe = db.collection("artifacts")
+      .doc("liveApp")
+      .collection("public")
+      .doc("data")
+      .collection("chat")
+      .orderBy("timestamp")
+      .onSnapshot(snapshot => {
+        chatBox.innerHTML = "";
+        snapshot.forEach(doc => {
+          const msg = doc.data();
+          const div = document.createElement("div");
+          div.className = "p-2 rounded bg-gray-700";
+          const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString() : "";
+          div.innerHTML = `<strong>${msg.name}</strong> [${time}]: ${msg.message}`;
+          chatBox.appendChild(div);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, error => {
+        console.error("Firestore listen error:", error);
+        const div = document.createElement("div");
+        div.className = "p-2 rounded bg-red-700";
+        div.innerText = "⚠️ Unable to connect to chat. Retrying...";
+        chatBox.appendChild(div);
+      });
+  } catch (error) {
+    console.error("Failed to subscribe chat:", error);
+  }
+}
 
-      // Message content
-      const content = document.createElement("div");
-      content.classList.add("flex-1");
+// ====== Video Player ======
+const video = document.getElementById("video");
+let hls;
 
-      const header = document.createElement("div");
-      header.classList.add("flex", "items-center", "justify-between", "text-sm", "text-gray-300");
-
-      const name = document.createElement("span");
-      name.classList.add("font-semibold", "text-white");
-      name.innerText = msg.name;
-
-      const time = document.createElement("span");
-      time.classList.add("text-xs", "text-gray-400");
-      time.innerText = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : "";
-
-      header.appendChild(name);
-      header.appendChild(time);
-
-      const text = document.createElement("div");
-      text.classList.add("text-white", "break-words");
-      text.innerText = msg.message;
-
-      content.appendChild(header);
-      content.appendChild(text);
-
-      div.appendChild(avatar);
-      div.appendChild(content);
-
-      chatBox.appendChild(div);
-    });
-    chatBox.scrollTop = chatBox.scrollHeight;
-  });
-
-// ====== HLS Video Player ======
-function playStream(source){
-  if(Hls.isSupported()){
-    if(hls) hls.destroy();
+function playStream(source) {
+  if (Hls.isSupported()) {
+    if (hls) hls.destroy();
     hls = new Hls();
     hls.loadSource(`/stream/${source}`);
     hls.attachMedia(video);
-  } else if(video.canPlayType("application/vnd.apple.mpegurl")){
+  } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
     video.src = `/stream/${source}`;
   }
 }
 
-function changeQuality(source){ playStream(source); }
-playStream("master_2000.m3u8"); // default 720p
+// Default quality 720p
+playStream("master_2000.m3u8");
+
+function changeQuality(source) {
+  playStream(source);
+}
 
 // ====== Viewer Count via WebSocket ======
 const protocol = window.location.protocol === "https:" ? "wss" : "ws";
@@ -136,12 +169,10 @@ const ws = new WebSocket(`${protocol}://${window.location.host}`);
 
 ws.onmessage = event => {
   const data = JSON.parse(event.data);
-  if(data.viewers !== undefined){
-    viewerCountEl.innerText = `Viewers Online: ${data.viewers}`;
+  if (data.viewers !== undefined) {
+    document.getElementById("viewerCount").innerText = `Viewers Online: ${data.viewers}`;
   }
 };
 
-// ====== Mobile Chat Toggle ======
-toggleChat.onclick = () => {
-  document.querySelector("aside").classList.toggle("-translate-y-full");
-};
+// ====== Initialize ======
+initAuth();
