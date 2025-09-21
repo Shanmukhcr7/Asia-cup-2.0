@@ -1,191 +1,519 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Asia Cup Live - Hindi</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- JW Player Library -->
-<script src="//content.jwplatform.com/libraries/SAHhwvZq.js"></script>
-
-<style>
-  body{background:#000;margin:0;padding:0;overflow:hidden;font-family:Poppins,sans-serif;color:#e0e0e0}
-  html,body{height:100%}
-  #jwplayerDiv{width:100%!important;height:100%!important}
-
-  header{
-    position:fixed;top:0;left:0;right:0;height:70px;
-    background:rgba(10,10,10,0.85);
-    display:flex;align-items:center;justify-content:center;
-    z-index:9999;border-bottom:1px solid rgba(255,255,255,0.08);
-  }
-  header img{height:60%}
-  .menu-icon{position:absolute;left:16px;color:#fff;font-size:30px;cursor:pointer}
-
-  /* Sidebar */
-  .sidebar{
-    position:fixed;top:0;left:-280px;width:280px;height:100%;
-    background:rgba(255,255,255,0.1);backdrop-filter:blur(20px);
-    z-index:10001;transition:left 0.4s;padding-top:80px;
-  }
-  .sidebar.open{left:0;}
-  .sidebar a{display:block;padding:15px 24px;color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.1);}
-  .sidebar a:hover{background:rgba(255,255,255,0.15);}
-
-  .overlay{
-    position:fixed;top:0;left:0;width:100%;height:100%;
-    background:rgba(0,0,0,0.5);z-index:10000;display:none;
-  }
-  .overlay.show{display:block;}
-
-  /* Tabs */
-  .tabs{display:flex;justify-content:space-around;margin:80px auto 0;max-width:960px;}
-  .tab-button{flex:1;padding:12px;color:#b0b0b0;cursor:pointer;text-align:center;border:none;background:#111;font-weight:500;position:relative;}
-  .tab-button.active{color:#1db954;font-weight:600;}
-  .tab-content{display:none;max-width:960px;margin:20px auto;}
-  .tab-content.active{display:block;}
-  .tab-content iframe{width:100%;height:600px;border:0;}
-
-  /* Popup */
-  .modal{position:fixed;top:0;left:0;width:100vw;height:100vh;backdrop-filter:blur(6px);background:rgb(0 0 0/.4);display:flex;justify-content:center;align-items:center;z-index:9999}
-  .modal-content{background:rgb(255 255 255/.05);border:1px solid rgb(255 255 255/.1);border-radius:20px;padding:30px 25px;width:90%;max-width:400px;text-align:center;color:#f3f4f6;box-shadow:0 8px 32px rgb(0 0 0/.4);backdrop-filter:blur(12px)}
-  .modal-content h2{font-size:24px;font-weight:700;color:#facc15;margin-bottom:16px}
-  .modal-content p{font-size:16px;color:#d1d5db;margin-bottom:24px;line-height:1.5}
-  .modal-content button{width:100%;padding:12px;font-size:16px;border:none;border-radius:12px;margin-bottom:12px;cursor:pointer;transition:.3s}
-  #joinButton{background:linear-gradient(to right,#3b82f6,#06b6d4);color:#fff;font-weight:500}
-  #joinButton:hover{background:linear-gradient(to right,#2563eb,#0891b2);transform:scale(1.02)}
-  #closeButton{background:rgb(255 255 255/.1);color:#f3f4f6}
-  #closeButton:hover{background:rgb(255 255 255/.15);transform:scale(1.02)}
-
-  /* Telegram Banner */
-  .tg-banner{position:absolute;top:16px;left:16px;background:linear-gradient(135deg,rgba(29,161,242,.85),rgba(0,119,181,.85));backdrop-filter:blur(8px);border-radius:12px;padding:10px 16px;display:flex;align-items:center;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:1000}
-  .tg-banner img{width:28px;height:28px;margin-right:10px;border-radius:50%;border:2px solid rgba(255,255,255,.8)}
-  .tg-banner span{font-size:15px;font-weight:600;letter-spacing:.4px}
-
-  /* Error Banner */
-  #errorBanner{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;background:rgba(255,0,0,.7);padding:20px;border-radius:10px;text-align:center;z-index:10000}
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asia Cup Live & Chat</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1200px;
+            gap: 1.5rem;
+        }
+        @media (min-width: 1024px) {
+            .container {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+        }
+        .video-player {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .chat-container {
+            width: 100%;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            background-color: #1a1a1a;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        @media (min-width: 1024px) {
+            .chat-container {
+                width: 400px;
+                height: 700px;
+            }
+        }
+        .message-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 0.5rem;
+            padding: 0.5rem;
+        }
+        .message {
+            background-color: #333;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            word-wrap: break-word;
+        }
+        .message-user {
+            font-weight: 600;
+            color: #4ade80; /* A nice green for username */
+        }
+        .message-timestamp {
+            font-size: 0.75rem;
+            color: #999;
+            margin-left: 0.5rem;
+        }
+        .input-area {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .input-area input {
+            flex-grow: 1;
+            background-color: #444;
+            border: none;
+            outline: none;
+            padding: 0.75rem;
+            border-radius: 8px;
+            color: #fff;
+        }
+        .input-area button {
+            background-color: #4ade80;
+            color: #000;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-quality {
+            background-color: #2e2e2e;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            transition: background-color 0.2s;
+            border: none;
+        }
+        .btn-quality:hover {
+            background-color: #4ade80;
+        }
+        .hamburger-menu {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            z-index: 20;
+        }
+        .hamburger-menu .line {
+            width: 25px;
+            height: 3px;
+            background-color: #fff;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100%;
+            background-color: #222;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 10;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .side-menu.open {
+            transform: translateX(0);
+        }
+        .profile-page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1a1a1a;
+            border-radius: 12px;
+            padding: 1rem;
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .profile-page.show {
+            display: flex;
+        }
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4ade80;
+            color: #000;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .message-box.show {
+            opacity: 1;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-gray-900 text-white flex flex-col items-center p-4 min-h-screen">
 
-<header>
-  <span class="material-icons menu-icon" onclick="toggleSidebar()">menu</span>
-  <img src="https://i.ibb.co/4gZK8LNr/Picsart-25-07-19-12-43-47-571.png" alt="Logo">
-</header>
+    <h1 class="text-3xl lg:text-5xl font-extrabold text-green-400 my-4">🏏 Asia Cup Live (Hindi)</h1>
+    <p id="viewerCount" class="text-lg text-gray-400 mb-6">Viewers Online: 0</p>
+    <p id="userIdDisplay" class="text-sm text-gray-500 mb-2"></p>
 
-<!-- JW Player Container -->
-<div class="video-container" style="margin-top:90px;height:500px;max-width:960px;margin-left:auto;margin-right:auto;">
-  <div id="jwplayerDiv"></div>
-</div>
+    <div class="container">
+        <!-- Video Player & Quality Controls -->
+        <div class="video-player">
+            <video id="video" controls autoplay class="w-full h-auto max-w-full rounded-xl border-4 border-green-400 shadow-xl"></video>
+            <div class="flex justify-center gap-2 mt-4">
+                <button class="btn-quality" onclick="changeQuality('master_664.m3u8')">360p</button>
+                <button class="btn-quality" onclick="changeQuality('master_900.m3u8')">480p</button>
+                <button class="btn-quality" onclick="changeQuality('master_2000.m3u8')">720p</button>
+                <button class="btn-quality" onclick="changeQuality('master_3500.m3u8')">1080p</button>
+            </div>
+        </div>
 
-<!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-  <a href="https://t.me/+-mTqb9qmX7Q2ODdl" target="_blank">Join Telegram</a>
-  <a href="https://t.me/+-mTqb9qmX7Q2ODdl" target="_blank">Contact Us</a>
-  <a href="#" onclick="alert('Visitor Count Coming Soon')">Visitor Count</a>
-</div>
-<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+        <!-- Chat Container -->
+        <div id="chat-wrapper" class="chat-container">
+            <div id="chat-ui" class="flex flex-col h-full">
+                <h2 class="text-xl font-bold mb-4 text-green-400">Live Chat</h2>
+                <div id="message-list" class="message-list flex-grow bg-gray-800 rounded-lg p-3 overflow-y-auto">
+                    <!-- Messages will be rendered here -->
+                </div>
+                <div id="chat-input-area" class="input-area mt-4 hidden">
+                    <input type="text" id="message-input" placeholder="Type a message..." class="flex-grow bg-gray-700 border-none outline-none p-3 rounded-lg text-white placeholder-gray-400">
+                    <button id="send-btn" class="bg-green-500 hover:bg-green-600 text-black font-bold px-6 py-3 rounded-lg transition-colors duration-200">Send</button>
+                </div>
+                <div id="auth-ui" class="mt-4">
+                    <button id="google-signin-btn" class="w-full bg-green-500 hover:bg-green-600 text-black font-bold py-3 px-6 rounded-lg transition-colors duration-200">
+                        Sign in to Chat
+                    </button>
+                </div>
+            </div>
 
-<!-- Tabs -->
-<div class="tabs">
-  <button class="tab-button active" onclick="switchTab('chat')">Chat</button>
-  <button class="tab-button" onclick="switchTab('scoreboard')">Scoreboard</button>
-  <button class="tab-button" onclick="switchTab('highlights')">Highlights</button>
-</div>
+            <!-- Profile Page -->
+            <div id="profile-page" class="profile-page">
+                <h2 class="text-2xl font-bold mb-4 text-green-400">Profile</h2>
+                <div class="flex flex-col items-center gap-4">
+                    <img id="profile-picture" src="https://placehold.co/100x100" class="w-24 h-24 rounded-full border-2 border-green-400">
+                    <form id="profile-form" class="w-full flex flex-col gap-4">
+                        <label for="username-input" class="text-gray-300">Username:</label>
+                        <input type="text" id="username-input" class="p-3 rounded-lg bg-gray-700 text-white border border-gray-600">
+                        <label for="profile-picture-url-input" class="text-gray-300">Profile Picture URL:</label>
+                        <input type="text" id="profile-picture-url-input" class="p-3 rounded-lg bg-gray-700 text-white border border-gray-600">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200">
+                            Save Changes
+                        </button>
+                    </form>
+                </div>
+                <button id="back-to-chat-btn" class="mt-auto bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200">
+                    Back to Chat
+                </button>
+            </div>
+        </div>
+    </div>
 
+    <!-- Side Menu -->
+    <div id="side-menu" class="side-menu">
+        <h3 class="text-xl font-bold mb-6">User Menu</h3>
+        <p id="menu-username" class="mb-4 text-center"></p>
+        <button id="profile-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 mb-2">
+            Profile
+        </button>
+        <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200">
+            Logout
+        </button>
+    </div>
+    
+    <!-- Hamburger Menu (Moved to be a sibling of the chat container for fixed positioning) -->
+    <button id="hamburger-btn" class="hamburger-menu">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+    </button>
+    
+    <!-- Custom message box for UI feedback -->
+    <div id="message-box" class="message-box"></div>
 
+    <!-- HLS.js for video streaming -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
-<!-- Telegram Popup -->
-<div id="telegramPopup" class="modal">
-  <div class="modal-content">
-    <h2>Join Our Telegram!</h2>
-    <p>Get instant updates on all live matches and exclusive content by joining our Telegram channel <strong>@LIVE LINKS</strong></p>
-    <button id="joinButton" onclick="window.open('https://t.me/+-mTqb9qmX7Q2ODdl','_blank')">Join Now</button>
-    <button id="closeButton">Continue Watching</button>
-  </div>
-</div>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCustomToken, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-<!-- Error Banner -->
-<div id="errorBanner"></div>
+        // Global variables provided by the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        // Fallback Firebase config in case the global variable is not provided
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBlUX0Hse-jy9RJc-iOTRhwg7a7IYIBdtc",
+            authDomain: "molten-snowfall-393219.firebaseapp.com",
+            projectId: "molten-snowfall-393219",
+            storageBucket: "molten-snowfall-393219.firebasestorage.app",
+            messagingSenderId: "189522276669",
+            appId: "1:189522276669:web:981533b5f99be303721554"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Use debug logging for development
+        setLogLevel('debug');
 
-<script>
-  const TELEGRAM_LINK = "https://t.me/+-mTqb9qmX7Q2ODdl";
-  let failCount = 0;
-  let cropModes = ["uniform", "fill", "exactfit", "none"];
-  let currentCrop = 0;
+        // --- Firebase Initialization & Authentication ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        let isAuthReady = false;
 
-  async function fetchStreamConfig() {
-    try {
-      let res = await fetch("https://raw.githubusercontent.com/valverdeaegithu/pl/refs/heads/main/44willow.json", {cache:"no-store"});
-      if (!res.ok) throw new Error("Config fetch failed");
-      return await res.json();
-    } catch(err) { handleFailure("Config fetch error"); }
-  }
+        // --- UI Elements ---
+        const authUi = document.getElementById("auth-ui");
+        const chatUi = document.getElementById("chat-ui");
+        const chatInputArea = document.getElementById("chat-input-area");
+        const googleSignInBtn = document.getElementById("google-signin-btn");
+        const messageInput = document.getElementById("message-input");
+        const sendBtn = document.getElementById("send-btn");
+        const messageList = document.getElementById("message-list");
+        const userIdDisplay = document.getElementById("userIdDisplay");
+        const hamburgerBtn = document.getElementById("hamburger-btn");
+        const sideMenu = document.getElementById("side-menu");
+        const profileBtn = document.getElementById("profile-btn");
+        const logoutBtn = document.getElementById("logout-btn");
+        const profilePage = document.getElementById("profile-page");
+        const backToChatBtn = document.getElementById("back-to-chat-btn");
+        const usernameInput = document.getElementById("username-input");
+        const profilePictureUrlInput = document.getElementById("profile-picture-url-input");
+        const profileForm = document.getElementById("profile-form");
+        const profilePicture = document.getElementById("profile-picture");
+        const menuUsername = document.getElementById("menu-username");
+        const messageBox = document.getElementById("message-box");
 
-  function handleFailure(msg){
-    failCount++;
-    document.getElementById("errorBanner").innerText = msg + (failCount<3?" Retrying...":"");
-    document.getElementById("errorBanner").style.display = "block";
-    if(failCount>=3) window.location.href = TELEGRAM_LINK;
-    else setTimeout(init,1000);
-  }
+        let userId = null;
+        let userName = 'Anonymous';
+        let userPhoto = 'https://placehold.co/100x100';
+        let messageTimeout = null;
 
-  async function init(){
-    try {
-      const config = await fetchStreamConfig();
-      if(config){
-        const dashUrl = config.source.url;
-        const keyInfo = config.drm.clearkey.keys[0];
+        // Function to display a message box
+        function showMessage(text) {
+            messageBox.textContent = text;
+            messageBox.classList.add('show');
+            if (messageTimeout) clearTimeout(messageTimeout);
+            messageTimeout = setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
 
-        jwplayer("jwplayerDiv").setup({
-          file: dashUrl,
-          autostart:true,
-          mute:true,
-          stretching: cropModes[currentCrop],
-          width:"100%",
-          height:"100%",
-          type:"dash",
-          drm:{clearkey:{keyId:keyInfo.keyId,key:keyInfo.key}},
-          controls:true,
-          skin:{name:"seven"}
-        }).on("ready",()=>{
-          document.getElementById("errorBanner").style.display="none";
-          jwplayer("jwplayerDiv").addButton(
-            "https://i.postimg.cc/HxwwrjnX/ratio.webp",
-            "Change Aspect Ratio",
-            ()=>{
-              currentCrop=(currentCrop+1)%cropModes.length;
-              jwplayer("jwplayerDiv").setConfig({stretching:cropModes[currentCrop]});
-            },"crop"
-          );
-        }).on("error",()=>handleFailure("Stream error"));
-      }
-    } catch(err){ handleFailure("Unexpected error"); }
-  }
+        // --- WebSocket (Existing) ---
+        const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+        const ws = new WebSocket(`${protocol}://${window.location.host}`);
 
-  // Popup logic
-  document.addEventListener("DOMContentLoaded",()=>{
-    document.getElementById("closeButton").addEventListener("click",()=>{
-      document.getElementById("telegramPopup").style.display="none";
-      init();
-    });
-  });
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.viewers !== undefined) {
+                document.getElementById("viewerCount").innerText = `Viewers Online: ${data.viewers}`;
+            }
+        };
 
-  // Sidebar toggle
-  function toggleSidebar(){
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('show');
-  }
+        // --- Video Player (Updated to use server proxy) ---
+        const video = document.getElementById("video");
+        let hls;
 
-  // Tabs
-  function switchTab(tabId){
-    document.querySelectorAll('.tab-button').forEach(btn=>btn.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-    if(tabId==='chat') document.querySelector('.tab-button:nth-child(1)').classList.add('active');
-    if(tabId==='scoreboard') document.querySelector('.tab-button:nth-child(2)').classList.add('active');
-    if(tabId==='highlights') document.querySelector('.tab-button:nth-child(3)').classList.add('active');
-    document.getElementById(tabId).classList.add('active');
-  }
-</script>
+        const defaultStream = `/stream/master_2000.m3u8`;
+
+        function playStream(source) {
+            if (Hls.isSupported()) {
+                if (hls) hls.destroy();
+                // Configure HLS.js for smoother live streaming
+                hls = new Hls({
+                    // Correcting the config to use consistent segment-based parameters
+                    liveSyncDurationCount: 3, 
+                    liveMaxLatencyDurationCount: 8,
+                });
+                hls.loadSource(source);
+                hls.attachMedia(video);
+            } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+                video.src = source;
+            }
+        }
+        playStream(defaultStream);
+
+        window.changeQuality = function(source) {
+            playStream(`/stream/${source}`);
+        }
+
+        // --- Initial Authentication & State Management ---
+        async function initAuth() {
+            if (initialAuthToken) {
+                try {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("Signed in with custom token.");
+                } catch (error) {
+                    console.error("Error signing in with custom token:", error);
+                }
+            } else {
+                 console.log("No custom token available. User will remain logged out until they sign in with Google.");
+            }
+            isAuthReady = true;
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.isAnonymous === false) {
+                userId = user.uid;
+                userName = user.displayName || 'Anonymous';
+                userPhoto = user.photoURL || 'https://placehold.co/100x100';
+                
+                chatInputArea.classList.remove('hidden');
+                authUi.classList.add('hidden');
+                hamburgerBtn.classList.remove('hidden');
+                userIdDisplay.innerText = `User ID: ${userId}`;
+                menuUsername.innerText = `Logged in as: ${userName}`;
+            } else {
+                userId = null;
+                userName = 'Anonymous';
+                userPhoto = 'https://placehold.co/100x100';
+                
+                chatInputArea.classList.add('hidden');
+                authUi.classList.remove('hidden');
+                hamburgerBtn.classList.add('hidden');
+                userIdDisplay.innerText = '';
+                menuUsername.innerText = '';
+            }
+        });
+        
+        googleSignInBtn.addEventListener('click', async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Error during Google Sign-In:", error);
+            }
+        });
+
+        // --- UI & Menu Logic ---
+        hamburgerBtn.addEventListener('click', () => {
+            sideMenu.classList.toggle('open');
+        });
+
+        profileBtn.addEventListener('click', () => {
+            sideMenu.classList.remove('open');
+            profilePage.classList.add('show');
+            chatUi.classList.add('hidden');
+            if (auth.currentUser) {
+                usernameInput.value = auth.currentUser.displayName || '';
+                profilePictureUrlInput.value = auth.currentUser.photoURL || '';
+                profilePicture.src = auth.currentUser.photoURL || 'https://placehold.co/100x100';
+            }
+        });
+
+        backToChatBtn.addEventListener('click', () => {
+            profilePage.classList.remove('show');
+            chatUi.classList.remove('hidden');
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+            sideMenu.classList.remove('open');
+            console.log("User logged out.");
+        });
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newName = usernameInput.value;
+            const newPhotoUrl = profilePictureUrlInput.value;
+            try {
+                await updateProfile(auth.currentUser, {
+                    displayName: newName,
+                    photoURL: newPhotoUrl
+                });
+                showMessage('Profile updated successfully!');
+            } catch (error) {
+                console.error("Error updating profile:", error);
+            }
+        });
+        
+        // --- Firestore Chat Functionality ---
+        const messagesRef = collection(db, `artifacts/${appId}/public/data/chat_messages`);
+
+        async function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText === "" || !userId) return;
+
+            try {
+                await addDoc(messagesRef, {
+                    text: messageText,
+                    uid: userId,
+                    name: userName,
+                    photoURL: userPhoto,
+                    timestamp: serverTimestamp()
+                });
+                messageInput.value = '';
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Listen for messages in real-time (anyone can read)
+        onSnapshot(messagesRef, (snapshot) => {
+            const messages = [];
+            snapshot.forEach((doc) => {
+                messages.push(doc.data());
+            });
+            // Sort messages by timestamp on the client-side
+            messages.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+            messageList.innerHTML = '';
+            messages.forEach((messageData) => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                
+                const time = messageData.timestamp ? new Date(messageData.timestamp.toDate()).toLocaleTimeString() : '...';
+                
+                messageElement.innerHTML = `
+                    <div class="flex items-center mb-1">
+                        <img src="${messageData.photoURL || 'https://placehold.co/100x100'}" alt="Profile Picture" class="w-6 h-6 rounded-full mr-2">
+                        <span class="message-user">${messageData.name}</span>
+                        <span class="message-timestamp">${time}</span>
+                    </div>
+                    <p class="text-white">${messageData.text}</p>
+                `;
+                messageList.appendChild(messageElement);
+            });
+        }, (error) => {
+            console.error("Error getting real-time messages:", error);
+        });
+        
+        initAuth();
+
+    </script>
 </body>
 </html>
