@@ -271,6 +271,29 @@
 
         setLogLevel('debug');
 
+        // Connect to your WebSocket server
+const wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws';
+const ws = new WebSocket(`${wsProtocol}://${location.host}`);
+
+// Listen for messages
+ws.addEventListener('message', (event) => {
+    try {
+        const data = JSON.parse(event.data);
+        if (data.viewers !== undefined) {
+            document.getElementById('viewerCount').innerText = `Viewers Online: ${data.viewers}`;
+        }
+    } catch (err) {
+        console.error("Error parsing WS message", err);
+    }
+});
+
+// Optional: reconnect logic if connection drops
+ws.addEventListener('close', () => {
+    console.log("WebSocket disconnected. Reconnecting in 3s...");
+    setTimeout(() => location.reload(), 3000);
+});
+
+
         const firebaseConfig = {
             apiKey: "AIzaSyBlUX0Hse-jy9RJc-iOTRhwg7a7IYIBdtc",
             authDomain: "molten-snowfall-393219.firebaseapp.com",
