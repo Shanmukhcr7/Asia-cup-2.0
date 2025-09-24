@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Asia Cup Live & Chat</title>
-    <!-- Tailwind CSS CDN for styling -->
+    <script src="//content.jwplatform.com/libraries/SAHhwvZq.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -35,6 +36,13 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
+        }
+        .jwplayer {
+            width: 100% !important;
+            max-width: 100%;
+            border-radius: 12px;
+            border: 4px solid #4ade80;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
         .chat-container {
             width: 100%;
@@ -69,7 +77,7 @@
         }
         .message-user {
             font-weight: 600;
-            color: #4ade80; /* A nice green for username */
+            color: #4ade80;
         }
         .message-timestamp {
             font-size: 0.75rem;
@@ -97,17 +105,6 @@
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             cursor: pointer;
-        }
-        .btn-quality {
-            background-color: #2e2e2e;
-            color: #fff;
-            padding: 0.75rem 1.5rem;
-            border-radius: 9999px;
-            transition: background-color 0.2s;
-            border: none;
-        }
-        .btn-quality:hover {
-            background-color: #4ade80;
         }
         .hamburger-menu {
             position: fixed;
@@ -182,30 +179,22 @@
     <p id="userIdDisplay" class="text-sm text-gray-500 mb-2"></p>
 
     <div class="container">
-        <!-- Video Player & Quality Controls -->
+        <!-- Video Player -->
         <div class="video-player">
-            <video id="video" controls autoplay class="w-full h-auto max-w-full rounded-xl border-4 border-green-400 shadow-xl"></video>
-            <div class="flex justify-center gap-2 mt-4">
-                <button class="btn-quality" onclick="changeQuality('master_664.m3u8')">360p</button>
-                <button class="btn-quality" onclick="changeQuality('master_900.m3u8')">480p</button>
-                <button class="btn-quality" onclick="changeQuality('master_2000.m3u8')">720p</button>
-                <button class="btn-quality" onclick="changeQuality('master_3500.m3u8')">1080p</button>
-            </div>
+            <div id="jwplayerDiv"></div>
         </div>
 
         <!-- Chat Container -->
         <div id="chat-wrapper" class="chat-container">
             <div id="chat-ui" class="flex flex-col h-full">
                 <h2 class="text-xl font-bold mb-4 text-green-400">Live Chat</h2>
-                <div id="message-list" class="message-list flex-grow bg-gray-800 rounded-lg p-3 overflow-y-auto">
-                    <!-- Messages will be rendered here -->
-                </div>
-                <div id="chat-input-area" class="input-area mt-4 hidden">
-                    <input type="text" id="message-input" placeholder="Type a message..." class="flex-grow bg-gray-700 border-none outline-none p-3 rounded-lg text-white placeholder-gray-400">
-                    <button id="send-btn" class="bg-green-500 hover:bg-green-600 text-black font-bold px-6 py-3 rounded-lg transition-colors duration-200">Send</button>
+                <div id="message-list" class="message-list"></div>
+                <div id="chat-input-area" class="input-area hidden">
+                    <input type="text" id="message-input" placeholder="Type a message..." />
+                    <button id="send-btn">Send</button>
                 </div>
                 <div id="auth-ui" class="mt-4">
-                    <button id="google-signin-btn" class="w-full bg-green-500 hover:bg-green-600 text-black font-bold py-3 px-6 rounded-lg transition-colors duration-200">
+                    <button id="google-signin-btn" class="w-full bg-green-500 text-black font-bold py-3 px-6 rounded-lg">
                         Sign in to Chat
                     </button>
                 </div>
@@ -221,12 +210,12 @@
                         <input type="text" id="username-input" class="p-3 rounded-lg bg-gray-700 text-white border border-gray-600">
                         <label for="profile-picture-url-input" class="text-gray-300">Profile Picture URL:</label>
                         <input type="text" id="profile-picture-url-input" class="p-3 rounded-lg bg-gray-700 text-white border border-gray-600">
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
                             Save Changes
                         </button>
                     </form>
                 </div>
-                <button id="back-to-chat-btn" class="mt-auto bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200">
+                <button id="back-to-chat-btn" class="mt-auto bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg">
                     Back to Chat
                 </button>
             </div>
@@ -237,38 +226,52 @@
     <div id="side-menu" class="side-menu">
         <h3 class="text-xl font-bold mb-6">User Menu</h3>
         <p id="menu-username" class="mb-4 text-center"></p>
-        <button id="profile-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 mb-2">
+        <button id="profile-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg mb-2">
             Profile
         </button>
-        <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200">
+        <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg">
             Logout
         </button>
     </div>
-    
-    <!-- Hamburger Menu (Moved to be a sibling of the chat container for fixed positioning) -->
+
+    <!-- Hamburger Menu -->
     <button id="hamburger-btn" class="hamburger-menu">
         <div class="line"></div>
         <div class="line"></div>
         <div class="line"></div>
     </button>
-    
-    <!-- Custom message box for UI feedback -->
+
+    <!-- Message Box -->
     <div id="message-box" class="message-box"></div>
 
-    <!-- HLS.js for video streaming -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <!-- JW Player setup -->
+    <script>
+        jwplayer("jwplayerDiv").setup({
+            file: "https://sundirectgo-live.pc.cdn.bitgravity.com/hd21/dth.mpd",
+            autostart: true,
+            mute: false,
+            stretching: "exactfit",
+            width: "100%",
+            aspectratio: "16:9",
+            type: "dash",
+            drm: { 
+                clearkey: {
+                    keyId: "8268467a7a974698b18c9e63b13f73a4",
+                    key: "6affb3ad6e781bc4afafad402e1d4510"
+                }
+            }
+        });
+    </script>
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase + Chat script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCustomToken, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global variables provided by the environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        
-        // Fallback Firebase config in case the global variable is not provided
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+        setLogLevel('debug');
+
+        const firebaseConfig = {
             apiKey: "AIzaSyBlUX0Hse-jy9RJc-iOTRhwg7a7IYIBdtc",
             authDomain: "molten-snowfall-393219.firebaseapp.com",
             projectId: "molten-snowfall-393219",
@@ -276,25 +279,17 @@
             messagingSenderId: "189522276669",
             appId: "1:189522276669:web:981533b5f99be303721554"
         };
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        // Use debug logging for development
-        setLogLevel('debug');
 
-        // --- Firebase Initialization & Authentication ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
-        let isAuthReady = false;
 
-        // --- UI Elements ---
+        // UI elements
         const authUi = document.getElementById("auth-ui");
-        const chatUi = document.getElementById("chat-ui");
         const chatInputArea = document.getElementById("chat-input-area");
         const googleSignInBtn = document.getElementById("google-signin-btn");
-        const messageInput = document.getElementById("message-input");
         const sendBtn = document.getElementById("send-btn");
+        const messageInput = document.getElementById("message-input");
         const messageList = document.getElementById("message-list");
         const userIdDisplay = document.getElementById("userIdDisplay");
         const hamburgerBtn = document.getElementById("hamburger-btn");
@@ -315,75 +310,19 @@
         let userPhoto = 'https://placehold.co/100x100';
         let messageTimeout = null;
 
-        // Function to display a message box
         function showMessage(text) {
             messageBox.textContent = text;
             messageBox.classList.add('show');
             if (messageTimeout) clearTimeout(messageTimeout);
-            messageTimeout = setTimeout(() => {
-                messageBox.classList.remove('show');
-            }, 3000);
+            messageTimeout = setTimeout(() => messageBox.classList.remove('show'), 3000);
         }
 
-        // --- WebSocket (Existing) ---
-        const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-        const ws = new WebSocket(`${protocol}://${window.location.host}`);
-
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.viewers !== undefined) {
-                document.getElementById("viewerCount").innerText = `Viewers Online: ${data.viewers}`;
-            }
-        };
-
-        // --- Video Player (Updated to use server proxy) ---
-        const video = document.getElementById("video");
-        let hls;
-
-        const defaultStream = `/stream/master_2000.m3u8`;
-
-        function playStream(source) {
-            if (Hls.isSupported()) {
-                if (hls) hls.destroy();
-                // Configure HLS.js for smoother live streaming
-                hls = new Hls({
-                    // Correcting the config to use consistent segment-based parameters
-                    liveSyncDurationCount: 3, 
-                    liveMaxLatencyDurationCount: 8,
-                });
-                hls.loadSource(source);
-                hls.attachMedia(video);
-            } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-                video.src = source;
-            }
-        }
-        playStream(defaultStream);
-
-        window.changeQuality = function(source) {
-            playStream(`/stream/${source}`);
-        }
-
-        // --- Initial Authentication & State Management ---
-        async function initAuth() {
-            if (initialAuthToken) {
-                try {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                    console.log("Signed in with custom token.");
-                } catch (error) {
-                    console.error("Error signing in with custom token:", error);
-                }
-            } else {
-                 console.log("No custom token available. User will remain logged out until they sign in with Google.");
-            }
-            isAuthReady = true;
-        }
-
+        // Authentication
         onAuthStateChanged(auth, (user) => {
-            if (user && user.isAnonymous === false) {
+            if (user && !user.isAnonymous) {
                 userId = user.uid;
                 userName = user.displayName || 'Anonymous';
                 userPhoto = user.photoURL || 'https://placehold.co/100x100';
-                
                 chatInputArea.classList.remove('hidden');
                 authUi.classList.add('hidden');
                 hamburgerBtn.classList.remove('hidden');
@@ -393,7 +332,6 @@
                 userId = null;
                 userName = 'Anonymous';
                 userPhoto = 'https://placehold.co/100x100';
-                
                 chatInputArea.classList.add('hidden');
                 authUi.classList.remove('hidden');
                 hamburgerBtn.classList.add('hidden');
@@ -401,119 +339,77 @@
                 menuUsername.innerText = '';
             }
         });
-        
+
         googleSignInBtn.addEventListener('click', async () => {
             const provider = new GoogleAuthProvider();
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error("Error during Google Sign-In:", error);
-            }
+            await signInWithPopup(auth, provider);
         });
 
-        // --- UI & Menu Logic ---
-        hamburgerBtn.addEventListener('click', () => {
-            sideMenu.classList.toggle('open');
-        });
-
+        hamburgerBtn.addEventListener('click', () => sideMenu.classList.toggle('open'));
         profileBtn.addEventListener('click', () => {
             sideMenu.classList.remove('open');
             profilePage.classList.add('show');
-            chatUi.classList.add('hidden');
+            chatInputArea.classList.add('hidden');
             if (auth.currentUser) {
                 usernameInput.value = auth.currentUser.displayName || '';
                 profilePictureUrlInput.value = auth.currentUser.photoURL || '';
                 profilePicture.src = auth.currentUser.photoURL || 'https://placehold.co/100x100';
             }
         });
-
         backToChatBtn.addEventListener('click', () => {
             profilePage.classList.remove('show');
-            chatUi.classList.remove('hidden');
+            chatInputArea.classList.remove('hidden');
         });
-
         logoutBtn.addEventListener('click', async () => {
             await signOut(auth);
             sideMenu.classList.remove('open');
-            console.log("User logged out.");
         });
-
         profileForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const newName = usernameInput.value;
-            const newPhotoUrl = profilePictureUrlInput.value;
-            try {
-                await updateProfile(auth.currentUser, {
-                    displayName: newName,
-                    photoURL: newPhotoUrl
-                });
-                showMessage('Profile updated successfully!');
-            } catch (error) {
-                console.error("Error updating profile:", error);
-            }
+            await updateProfile(auth.currentUser, {
+                displayName: usernameInput.value,
+                photoURL: profilePictureUrlInput.value
+            });
+            showMessage('Profile updated successfully!');
         });
-        
-        // --- Firestore Chat Functionality ---
-        const messagesRef = collection(db, `artifacts/${appId}/public/data/chat_messages`);
 
+        // Firestore Chat
+        const messagesRef = collection(db, `artifacts/default-app-id/public/data/chat_messages`);
         async function sendMessage() {
             const messageText = messageInput.value.trim();
-            if (messageText === "" || !userId) return;
-
-            try {
-                await addDoc(messagesRef, {
-                    text: messageText,
-                    uid: userId,
-                    name: userName,
-                    photoURL: userPhoto,
-                    timestamp: serverTimestamp()
-                });
-                messageInput.value = '';
-            } catch (e) {
-                console.error("Error adding document: ", e);
-            }
+            if (!messageText || !userId) return;
+            await addDoc(messagesRef, {
+                text: messageText,
+                uid: userId,
+                name: userName,
+                photoURL: userPhoto,
+                timestamp: serverTimestamp()
+            });
+            messageInput.value = '';
         }
-
         sendBtn.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
+        messageInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
 
-        // Listen for messages in real-time (anyone can read)
         onSnapshot(messagesRef, (snapshot) => {
             const messages = [];
-            snapshot.forEach((doc) => {
-                messages.push(doc.data());
-            });
-            // Sort messages by timestamp on the client-side
+            snapshot.forEach(doc => messages.push(doc.data()));
             messages.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-
             messageList.innerHTML = '';
-            messages.forEach((messageData) => {
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message');
-                
-                const time = messageData.timestamp ? new Date(messageData.timestamp.toDate()).toLocaleTimeString() : '...';
-                
-                messageElement.innerHTML = `
+            messages.forEach(msg => {
+                const el = document.createElement('div');
+                el.classList.add('message');
+                const time = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString() : '...';
+                el.innerHTML = `
                     <div class="flex items-center mb-1">
-                        <img src="${messageData.photoURL || 'https://placehold.co/100x100'}" alt="Profile Picture" class="w-6 h-6 rounded-full mr-2">
-                        <span class="message-user">${messageData.name}</span>
+                        <img src="${msg.photoURL || 'https://placehold.co/100x100'}" class="w-6 h-6 rounded-full mr-2">
+                        <span class="message-user">${msg.name}</span>
                         <span class="message-timestamp">${time}</span>
                     </div>
-                    <p class="text-white">${messageData.text}</p>
+                    <p>${msg.text}</p>
                 `;
-                messageList.appendChild(messageElement);
+                messageList.appendChild(el);
             });
-        }, (error) => {
-            console.error("Error getting real-time messages:", error);
         });
-        
-        initAuth();
-
     </script>
 </body>
 </html>
