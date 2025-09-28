@@ -1,438 +1,417 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Asia Cup Live & Chat</title>
-    <script src="//content.jwplatform.com/libraries/SAHhwvZq.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asia Cup Live & Chat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1rem;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 1200px;
-            gap: 1.5rem;
-        }
-        @media (min-width: 1024px) {
-            .container {
-                flex-direction: row;
-                align-items: flex-start;
-            }
-        }
-        .video-player {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .jwplayer {
-            width: 100% !important;
-            max-width: 100%;
-            border-radius: 12px;
-            border: 4px solid #4ade80;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        .chat-container {
-            width: 100%;
-            height: 500px;
-            display: flex;
-            flex-direction: column;
-            background-color: #1a1a1a;
-            border-radius: 12px;
-            padding: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            position: relative;
-        }
-        @media (min-width: 1024px) {
-            .chat-container {
-                width: 400px;
-                height: 700px;
-            }
-        }
-        .message-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 0.5rem;
-            padding: 0.5rem;
-        }
-        .message {
-            background-color: #333;
-            border-radius: 8px;
-            padding: 0.5rem 0.75rem;
-            word-wrap: break-word;
-        }
-        .message-user {
-            font-weight: 600;
-            color: #4ade80;
-        }
-        .message-timestamp {
-            font-size: 0.75rem;
-            color: #999;
-            margin-left: 0.5rem;
-        }
-        .input-area {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-        .input-area input {
-            flex-grow: 1;
-            background-color: #444;
-            border: none;
-            outline: none;
-            padding: 0.75rem;
-            border-radius: 8px;
-            color: #fff;
-        }
-        .input-area button {
-            background-color: #4ade80;
-            color: #000;
-            font-weight: bold;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .hamburger-menu {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            cursor: pointer;
-            z-index: 20;
-        }
-        .hamburger-menu .line {
-            width: 25px;
-            height: 3px;
-            background-color: #fff;
-            margin: 5px 0;
-            transition: all 0.3s ease;
-        }
-        .side-menu {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 250px;
-            height: 100%;
-            background-color: #222;
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 10;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-        }
-        .side-menu.open {
-            transform: translateX(0);
-        }
-        .profile-page {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #1a1a1a;
-            border-radius: 12px;
-            padding: 1rem;
-            display: none;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .profile-page.show {
-            display: flex;
-        }
-        .message-box {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #4ade80;
-            color: #000;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .message-box.show {
-            opacity: 1;
-        }
-    </style>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 1200px;
+      gap: 1.5rem;
+    }
+    @media (min-width: 1024px) {
+      .container {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+    }
+    .video-player {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    iframe {
+      width: 100%;
+      height: 600px;
+      border-radius: 12px;
+      border: 4px solid #4ade80;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .chat-container {
+      width: 100%;
+      height: 500px;
+      display: flex;
+      flex-direction: column;
+      background-color: #1a1a1a;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+    @media (min-width: 1024px) {
+      .chat-container {
+        width: 400px;
+        height: 700px;
+      }
+    }
+    .message-list {
+      flex-grow: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.5rem;
+      padding: 0.5rem;
+    }
+    .message {
+      background-color: #333;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      word-wrap: break-word;
+    }
+    .message-user {
+      font-weight: 600;
+      color: #4ade80;
+    }
+    .message-timestamp {
+      font-size: 0.75rem;
+      color: #999;
+      margin-left: 0.5rem;
+    }
+    .input-area {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .input-area input {
+      flex-grow: 1;
+      background-color: #444;
+      border: none;
+      outline: none;
+      padding: 0.75rem;
+      border-radius: 8px;
+      color: #fff;
+    }
+    .input-area button {
+      background-color: #4ade80;
+      color: #000;
+      font-weight: bold;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .hamburger-menu {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      cursor: pointer;
+      z-index: 20;
+    }
+    .hamburger-menu .line {
+      width: 25px;
+      height: 3px;
+      background-color: #fff;
+      margin: 5px 0;
+      transition: all 0.3s ease;
+    }
+    .side-menu {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 250px;
+      height: 100%;
+      background-color: #222;
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+      z-index: 10;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .side-menu.open {
+      transform: translateX(0);
+    }
+    .profile-page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #1a1a1a;
+      border-radius: 12px;
+      padding: 1rem;
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .profile-page.show {
+      display: flex;
+    }
+    .message-box {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #4ade80;
+      color: #000;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .message-box.show {
+      opacity: 1;
+    }
+  </style>
 </head>
 <body class="bg-gray-900 text-white flex flex-col items-center p-4 min-h-screen">
 
-    <h1 class="text-3xl lg:text-5xl font-extrabold text-green-400 my-4">🏏 Asia Cup Live (Hindi)</h1>
-    <p id="viewerCount" class="text-lg text-gray-400 mb-6">Viewers Online: 0</p>
-    <p id="userIdDisplay" class="text-sm text-gray-500 mb-2"></p>
+  <h1 class="text-3xl lg:text-5xl font-extrabold text-green-400 my-4">🏏 Asia Cup Live (Hindi)</h1>
+  <p id="viewerCount" class="text-lg text-gray-400 mb-6">Viewers Online: 0</p>
+  <p id="userIdDisplay" class="text-sm text-gray-500 mb-2"></p>
 
-    <div class="container">
-        <!-- Video Player -->
-        <div class="video-player">
-            <div id="jwplayerDiv"></div>
-        </div>
-
-        <!-- Chat Container -->
-        <div id="chat-wrapper" class="chat-container">
-            <div id="chat-ui" class="flex flex-col h-full">
-                <h2 class="text-xl font-bold mb-4 text-green-400">Live Chat</h2>
-                <div id="message-list" class="message-list"></div>
-                <div id="chat-input-area" class="input-area hidden">
-                    <input type="text" id="message-input" placeholder="Type a message..." />
-                    <button id="send-btn">Send</button>
-                </div>
-                <div id="auth-ui" class="mt-4">
-                    <button id="google-signin-btn" class="w-full bg-green-500 text-black font-bold py-3 px-6 rounded-lg">
-                        Sign in to Chat
-                    </button>
-                </div>
-            </div>
-
-            <!-- Profile Page -->
-            <div id="profile-page" class="profile-page">
-                <h2 class="text-2xl font-bold mb-4 text-green-400">Profile</h2>
-                <div class="flex flex-col items-center gap-4">
-                    <img id="profile-picture" src="https://placehold.co/100x100" class="w-24 h-24 rounded-full border-2 border-green-400">
-                    <form id="profile-form" class="w-full flex flex-col gap-4">
-                        <label for="username-input" class="text-gray-300">Username:</label>
-                        <input type="text" id="username-input" class="p-3 rounded-lg bg-gray-700 text-white border border-gray-600">
-                        <label for="profile-picture-url-input" class="text-gray-300">Profile Picture URL:</label>
-                        <input type="text" id="profile-picture-url-input" class="p-3 rounded-lg bg-gray-700 text-white border border-gray-600">
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
-                            Save Changes
-                        </button>
-                    </form>
-                </div>
-                <button id="back-to-chat-btn" class="mt-auto bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg">
-                    Back to Chat
-                </button>
-            </div>
-        </div>
+  <div class="container">
+    <!-- Video Player -->
+    <div class="video-player">
+      <iframe src="https://ar-pi-drab.vercel.app/" 
+              loading="lazy"
+              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen; geolocation; web-share; speaker-selection; screen-wake-lock; idle-detection" 
+              allowfullscreen>
+      </iframe>
     </div>
 
-    <!-- Side Menu -->
-    <div id="side-menu" class="side-menu">
-        <h3 class="text-xl font-bold mb-6">User Menu</h3>
-        <p id="menu-username" class="mb-4 text-center"></p>
-        <button id="profile-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg mb-2">
-            Profile
-        </button>
-        <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg">
-            Logout
-        </button>
-    </div>
+    <!-- Chat Container -->
+    <div id="chat-wrapper" class="chat-container">
+      <div id="chat-ui" class="flex flex-col h-full">
+        <h2 class="text-xl font-bold mb-4 text-green-400">Live Chat</h2>
+        <div id="message-list" class="message-list"></div>
+        <div id="chat-input-area" class="input-area hidden">
+          <input type="text" id="message-input" placeholder="Type a message..." />
+          <button id="send-btn">Send</button>
+        </div>
+        <div id="auth-ui" class="mt-4">
+          <button id="google-signin-btn" class="w-full bg-green-500 text-black font-bold py-3 px-6 rounded-lg">
+            Sign in to Chat
+          </button>
+        </div>
+      </div>
 
-    <!-- Hamburger Menu -->
-    <button id="hamburger-btn" class="hamburger-menu">
-        <div class="line"></div>
-        <div class="line"></div>
-        <div class="line"></div>
+      <!-- Profile Page -->
+      <div id="profile-page" class="profile-page">
+        <h2 class="text-2xl font-bold mb-4 text-green-400">Profile</h2>
+        <div class="flex flex-col items-center gap-4">
+          <img id="profile-picture" src="https://placehold.co/100x100" class="w-24 h-24 rounded-full border-2 border-green-400">
+          <form id="profile-form" class="w-full flex flex-col gap-4">
+            <label for="username-input" class="text-gray-300">Username:</label>
+            <input type="text" id="username-input" class="p-3 rounded-lg bg-gray-700 text-white border border-gray-600">
+            <label for="profile-picture-url-input" class="text-gray-300">Profile Picture URL:</label>
+            <input type="text" id="profile-picture-url-input" class="p-3 rounded-lg bg-gray-700 text-white border border-gray-600">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
+              Save Changes
+            </button>
+          </form>
+        </div>
+        <button id="back-to-chat-btn" class="mt-auto bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg">
+          Back to Chat
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Side Menu -->
+  <div id="side-menu" class="side-menu">
+    <h3 class="text-xl font-bold mb-6">User Menu</h3>
+    <p id="menu-username" class="mb-4 text-center"></p>
+    <button id="profile-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg mb-2">
+      Profile
     </button>
+    <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg">
+      Logout
+    </button>
+  </div>
 
-    <!-- Message Box -->
-    <div id="message-box" class="message-box"></div>
+  <!-- Hamburger Menu -->
+  <button id="hamburger-btn" class="hamburger-menu">
+    <div class="line"></div>
+    <div class="line"></div>
+    <div class="line"></div>
+  </button>
 
-    <!-- JW Player setup -->
-    <script>
-        jwplayer("jwplayerDiv").setup({
-            file: "https://sundirectgo-live.pc.cdn.bitgravity.com/hd21/dth.mpd",
-            autostart: true,
-            mute: false,
-            stretching: "exactfit",
-            width: "100%",
-            aspectratio: "16:9",
-            type: "dash",
-            drm: { 
-                clearkey: {
-                    keyId: "8268467a7a974698b18c9e63b13f73a4",
-                    key: "6affb3ad6e781bc4afafad402e1d4510"
-                }
-            }
-        });
-    </script>
+  <!-- Message Box -->
+  <div id="message-box" class="message-box"></div>
 
-    <!-- Firebase + Chat script -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCustomToken, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  <!-- Firebase + Chat script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        setLogLevel('debug');
+    setLogLevel('debug');
 
-        // Connect to your WebSocket server
-const wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws';
-const ws = new WebSocket(`${wsProtocol}://${location.host}`);
-
-// Listen for messages
-ws.addEventListener('message', (event) => {
-    try {
+    // WebSocket viewer counter
+    const wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws';
+    const ws = new WebSocket(`${wsProtocol}://${location.host}`);
+    ws.addEventListener('message', (event) => {
+      try {
         const data = JSON.parse(event.data);
         if (data.viewers !== undefined) {
-            document.getElementById('viewerCount').innerText = `Viewers Online: ${data.viewers}`;
+          document.getElementById('viewerCount').innerText = `Viewers Online: ${data.viewers}`;
         }
-    } catch (err) {
+      } catch (err) {
         console.error("Error parsing WS message", err);
+      }
+    });
+    ws.addEventListener('close', () => {
+      console.log("WebSocket disconnected. Reconnecting in 3s...");
+      setTimeout(() => location.reload(), 3000);
+    });
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlUX0Hse-jy9RJc-iOTRhwg7a7IYIBdtc",
+      authDomain: "molten-snowfall-393219.firebaseapp.com",
+      projectId: "molten-snowfall-393219",
+      storageBucket: "molten-snowfall-393219.firebasestorage.app",
+      messagingSenderId: "189522276669",
+      appId: "1:189522276669:web:981533b5f99be303721554"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // UI elements
+    const authUi = document.getElementById("auth-ui");
+    const chatInputArea = document.getElementById("chat-input-area");
+    const googleSignInBtn = document.getElementById("google-signin-btn");
+    const sendBtn = document.getElementById("send-btn");
+    const messageInput = document.getElementById("message-input");
+    const messageList = document.getElementById("message-list");
+    const userIdDisplay = document.getElementById("userIdDisplay");
+    const hamburgerBtn = document.getElementById("hamburger-btn");
+    const sideMenu = document.getElementById("side-menu");
+    const profileBtn = document.getElementById("profile-btn");
+    const logoutBtn = document.getElementById("logout-btn");
+    const profilePage = document.getElementById("profile-page");
+    const backToChatBtn = document.getElementById("back-to-chat-btn");
+    const usernameInput = document.getElementById("username-input");
+    const profilePictureUrlInput = document.getElementById("profile-picture-url-input");
+    const profileForm = document.getElementById("profile-form");
+    const profilePicture = document.getElementById("profile-picture");
+    const menuUsername = document.getElementById("menu-username");
+    const messageBox = document.getElementById("message-box");
+
+    let userId = null;
+    let userName = 'Anonymous';
+    let userPhoto = 'https://placehold.co/100x100';
+    let messageTimeout = null;
+
+    function showMessage(text) {
+      messageBox.textContent = text;
+      messageBox.classList.add('show');
+      if (messageTimeout) clearTimeout(messageTimeout);
+      messageTimeout = setTimeout(() => messageBox.classList.remove('show'), 3000);
     }
-});
 
-// Optional: reconnect logic if connection drops
-ws.addEventListener('close', () => {
-    console.log("WebSocket disconnected. Reconnecting in 3s...");
-    setTimeout(() => location.reload(), 3000);
-});
+    // Authentication
+    onAuthStateChanged(auth, (user) => {
+      if (user && !user.isAnonymous) {
+        userId = user.uid;
+        userName = user.displayName || 'Anonymous';
+        userPhoto = user.photoURL || 'https://placehold.co/100x100';
+        chatInputArea.classList.remove('hidden');
+        authUi.classList.add('hidden');
+        hamburgerBtn.classList.remove('hidden');
+        userIdDisplay.innerText = `User ID: ${userId}`;
+        menuUsername.innerText = `Logged in as: ${userName}`;
+      } else {
+        userId = null;
+        userName = 'Anonymous';
+        userPhoto = 'https://placehold.co/100x100';
+        chatInputArea.classList.add('hidden');
+        authUi.classList.remove('hidden');
+        hamburgerBtn.classList.add('hidden');
+        userIdDisplay.innerText = '';
+        menuUsername.innerText = '';
+      }
+    });
 
+    googleSignInBtn.addEventListener('click', async () => {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    });
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBlUX0Hse-jy9RJc-iOTRhwg7a7IYIBdtc",
-            authDomain: "molten-snowfall-393219.firebaseapp.com",
-            projectId: "molten-snowfall-393219",
-            storageBucket: "molten-snowfall-393219.firebasestorage.app",
-            messagingSenderId: "189522276669",
-            appId: "1:189522276669:web:981533b5f99be303721554"
-        };
+    hamburgerBtn.addEventListener('click', () => sideMenu.classList.toggle('open'));
+    profileBtn.addEventListener('click', () => {
+      sideMenu.classList.remove('open');
+      profilePage.classList.add('show');
+      chatInputArea.classList.add('hidden');
+      if (auth.currentUser) {
+        usernameInput.value = auth.currentUser.displayName || '';
+        profilePictureUrlInput.value = auth.currentUser.photoURL || '';
+        profilePicture.src = auth.currentUser.photoURL || 'https://placehold.co/100x100';
+      }
+    });
+    backToChatBtn.addEventListener('click', () => {
+      profilePage.classList.remove('show');
+      chatInputArea.classList.remove('hidden');
+    });
+    logoutBtn.addEventListener('click', async () => {
+      await signOut(auth);
+      sideMenu.classList.remove('open');
+    });
+    profileForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await updateProfile(auth.currentUser, {
+        displayName: usernameInput.value,
+        photoURL: profilePictureUrlInput.value
+      });
+      showMessage('Profile updated successfully!');
+    });
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    // Firestore Chat
+    const messagesRef = collection(db, `artifacts/default-app-id/public/data/chat_messages`);
+    async function sendMessage() {
+      const messageText = messageInput.value.trim();
+      if (!messageText || !userId) return;
+      await addDoc(messagesRef, {
+        text: messageText,
+        uid: userId,
+        name: userName,
+        photoURL: userPhoto,
+        timestamp: serverTimestamp()
+      });
+      messageInput.value = '';
+    }
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
 
-        // UI elements
-        const authUi = document.getElementById("auth-ui");
-        const chatInputArea = document.getElementById("chat-input-area");
-        const googleSignInBtn = document.getElementById("google-signin-btn");
-        const sendBtn = document.getElementById("send-btn");
-        const messageInput = document.getElementById("message-input");
-        const messageList = document.getElementById("message-list");
-        const userIdDisplay = document.getElementById("userIdDisplay");
-        const hamburgerBtn = document.getElementById("hamburger-btn");
-        const sideMenu = document.getElementById("side-menu");
-        const profileBtn = document.getElementById("profile-btn");
-        const logoutBtn = document.getElementById("logout-btn");
-        const profilePage = document.getElementById("profile-page");
-        const backToChatBtn = document.getElementById("back-to-chat-btn");
-        const usernameInput = document.getElementById("username-input");
-        const profilePictureUrlInput = document.getElementById("profile-picture-url-input");
-        const profileForm = document.getElementById("profile-form");
-        const profilePicture = document.getElementById("profile-picture");
-        const menuUsername = document.getElementById("menu-username");
-        const messageBox = document.getElementById("message-box");
-
-        let userId = null;
-        let userName = 'Anonymous';
-        let userPhoto = 'https://placehold.co/100x100';
-        let messageTimeout = null;
-
-        function showMessage(text) {
-            messageBox.textContent = text;
-            messageBox.classList.add('show');
-            if (messageTimeout) clearTimeout(messageTimeout);
-            messageTimeout = setTimeout(() => messageBox.classList.remove('show'), 3000);
-        }
-
-        // Authentication
-        onAuthStateChanged(auth, (user) => {
-            if (user && !user.isAnonymous) {
-                userId = user.uid;
-                userName = user.displayName || 'Anonymous';
-                userPhoto = user.photoURL || 'https://placehold.co/100x100';
-                chatInputArea.classList.remove('hidden');
-                authUi.classList.add('hidden');
-                hamburgerBtn.classList.remove('hidden');
-                userIdDisplay.innerText = `User ID: ${userId}`;
-                menuUsername.innerText = `Logged in as: ${userName}`;
-            } else {
-                userId = null;
-                userName = 'Anonymous';
-                userPhoto = 'https://placehold.co/100x100';
-                chatInputArea.classList.add('hidden');
-                authUi.classList.remove('hidden');
-                hamburgerBtn.classList.add('hidden');
-                userIdDisplay.innerText = '';
-                menuUsername.innerText = '';
-            }
-        });
-
-        googleSignInBtn.addEventListener('click', async () => {
-            const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
-        });
-
-        hamburgerBtn.addEventListener('click', () => sideMenu.classList.toggle('open'));
-        profileBtn.addEventListener('click', () => {
-            sideMenu.classList.remove('open');
-            profilePage.classList.add('show');
-            chatInputArea.classList.add('hidden');
-            if (auth.currentUser) {
-                usernameInput.value = auth.currentUser.displayName || '';
-                profilePictureUrlInput.value = auth.currentUser.photoURL || '';
-                profilePicture.src = auth.currentUser.photoURL || 'https://placehold.co/100x100';
-            }
-        });
-        backToChatBtn.addEventListener('click', () => {
-            profilePage.classList.remove('show');
-            chatInputArea.classList.remove('hidden');
-        });
-        logoutBtn.addEventListener('click', async () => {
-            await signOut(auth);
-            sideMenu.classList.remove('open');
-        });
-        profileForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await updateProfile(auth.currentUser, {
-                displayName: usernameInput.value,
-                photoURL: profilePictureUrlInput.value
-            });
-            showMessage('Profile updated successfully!');
-        });
-
-        // Firestore Chat
-        const messagesRef = collection(db, `artifacts/default-app-id/public/data/chat_messages`);
-        async function sendMessage() {
-            const messageText = messageInput.value.trim();
-            if (!messageText || !userId) return;
-            await addDoc(messagesRef, {
-                text: messageText,
-                uid: userId,
-                name: userName,
-                photoURL: userPhoto,
-                timestamp: serverTimestamp()
-            });
-            messageInput.value = '';
-        }
-        sendBtn.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
-
-        onSnapshot(messagesRef, (snapshot) => {
-            const messages = [];
-            snapshot.forEach(doc => messages.push(doc.data()));
-            messages.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-            messageList.innerHTML = '';
-            messages.forEach(msg => {
-                const el = document.createElement('div');
-                el.classList.add('message');
-                const time = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString() : '...';
-                el.innerHTML = `
-                    <div class="flex items-center mb-1">
-                        <img src="${msg.photoURL || 'https://placehold.co/100x100'}" class="w-6 h-6 rounded-full mr-2">
-                        <span class="message-user">${msg.name}</span>
-                        <span class="message-timestamp">${time}</span>
-                    </div>
-                    <p>${msg.text}</p>
-                `;
-                messageList.appendChild(el);
-            });
-        });
-    </script>
+    onSnapshot(messagesRef, (snapshot) => {
+      const messages = [];
+      snapshot.forEach(doc => messages.push(doc.data()));
+      messages.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+      messageList.innerHTML = '';
+      messages.forEach(msg => {
+        const el = document.createElement('div');
+        el.classList.add('message');
+        const time = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString() : '...';
+        el.innerHTML = `
+          <div class="flex items-center mb-1">
+            <img src="${msg.photoURL || 'https://placehold.co/100x100'}" class="w-6 h-6 rounded-full mr-2">
+            <span class="message-user">${msg.name}</span>
+            <span class="message-timestamp">${time}</span>
+          </div>
+          <p>${msg.text}</p>
+        `;
+        messageList.appendChild(el);
+      });
+    });
+  </script>
 </body>
 </html>
