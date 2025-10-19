@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Star Sports English</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background: #000;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* Iframe Container */
+    .player-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Viewer Count Badge */
+    #viewerCount {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      color: #00ff00;
+      padding: 8px 16px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 20px;
+      z-index: 10000;
+      pointer-events: none;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Viewer Count -->
+  <div id="viewerCount">Viewers: 0</div>
+
+  <!-- Embedded Video Player -->
+  <div class="player-container">
+    <iframe 
+      src="https://hindipkl.onrender.com"
+      loading="lazy"
+      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen; geolocation; web-share; speaker-selection; screen-wake-lock; idle-detection"
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      /********** WebSocket Viewer Count **********/
+      const viewerCountEl = document.getElementById('viewerCount');
+      const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+      const ws = new WebSocket(`${protocol}://${window.location.host}`);
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'viewerCount') {
+            viewerCountEl.textContent = `Viewers: ${data.count}`;
+          }
+        } catch (e) { console.error(e); }
+      };
+    });
+  </script>
+
+</body>
+</html>
